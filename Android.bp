@@ -1,0 +1,16 @@
+cc_binary {
+    name: "fakeapproot",
+    srcs: [
+        "fakeapproot.cpp",
+        "socket.cpp",
+        "utils.cpp",
+    ],
+    cppflags: [
+        "-Wno-unused-parameter",
+    ],
+    shared_libs: [
+        "libutils",
+        "libhidlbase",
+    ],
+}
+
