@@ -17,6 +17,7 @@
 cc_binary {
     name: "fakeapproot",
     srcs: [
+        "cmd.cpp",
         "fakeapproot.cpp",
         "socket.cpp",
         "utils.cpp",
