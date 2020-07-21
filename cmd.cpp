@@ -45,13 +45,21 @@ int cmd_cp(std::vector<std::string>& input) {
     strcpy(_path, prefix);
     strcat(_path, input[2].c_str());
 #endif
-    cp_file(input[1].c_str(), input[2].c_str());
+    cp_file(input[1].c_str(), _path);
     return 0;
 }
 
 int cmd_chmod(std::vector<std::string>& input) {
     if (input.size() != 3) return 1;
-    do_chmod(input[1].c_str(), input[2].c_str());
+#ifdef IS_HOST
+    const char* _path = input[2].c_str();
+#else
+    const char *prefix = "/data/extra/";
+    char *_path = (char*) malloc(strlen(input[2].c_str()) + strlen(prefix) + 1);
+    strcpy(_path, prefix);
+    strcat(_path, input[2].c_str());
+#endif
+    do_chmod(input[1].c_str(), _path);
     return 0;
 }
 
