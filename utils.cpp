@@ -26,7 +26,7 @@
 
 #include "utils.h"
 
-void do_chown (const char *file_path,
+void do_chown(const char *file_path,
                const char *user_name,
                const char *group_name) {
     uid_t          uid;
@@ -68,7 +68,7 @@ void cp_file(const char *src_f, const char *dst_f) {
     dst << src.rdbuf();
 }
 
-int validatePath(std::string& str) {
+int validate_path(std::string& str) {
     std::string root("/");
     std::string parent("..");
     std::string term(";");

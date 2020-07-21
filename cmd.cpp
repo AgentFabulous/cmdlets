@@ -110,7 +110,7 @@ int cmd_fixperms(std::vector<std::string>& input) {
 int cmd_del(std::vector<std::string>& input) {
     if (input.size() != 2) return 1;
     std::string path = input[1];
-    if (validatePath(path)) {
+    if (validate_path(path)) {
 #ifdef IS_HOST
         const char *_del = "rm -rf ";
 #else
@@ -127,7 +127,7 @@ int cmd_del(std::vector<std::string>& input) {
 int cmd_mkdir(std::vector<std::string>& input) {
     if (input.size() != 2) return 1;
     std::string path = input[1];
-    if (validatePath(path)) {
+    if (validate_path(path)) {
 #ifdef IS_HOST
         const char * _mkdir = "mkdir -p ";
 #else
