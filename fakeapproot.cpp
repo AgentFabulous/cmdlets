@@ -18,7 +18,7 @@
 
 int client(int argc, char **argv) {
     int s, t;
-    char str_recv[100];
+    char str_recv[1024];
 
     s = create_socket();
     connect_socket(s);
@@ -28,7 +28,8 @@ int client(int argc, char **argv) {
     char *str = (char *) malloc(v);
 
     for(i = 1; i <= size; i++) {
-        str = (char *) realloc(str, (v + strlen(argv[i])));
+        v += strlen(argv[i]) + 1;
+        str = (char *) realloc(str, v);
         strcat(str, argv[i]);
         strcat(str, " ");
     }
@@ -111,7 +112,7 @@ int server() {
     int s, s2;
     socklen_t t;
     struct sockaddr_un remote;
-    char str[100];
+    char str[1024];
 
     s = create_socket();
     bind_socket(s);
@@ -133,7 +134,7 @@ int server() {
         }
         done = 0;
         while (!done) {
-            n = recv(s2, str, 100, 0);
+            n = recv(s2, str, 1024, 0);
             if (n <= 0) {
                 if (n < 0) perror("recv");
                 done = 1;
