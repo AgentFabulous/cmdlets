@@ -19,13 +19,29 @@ int cmd_processor(char *cmd) {
     const char *_cmd = result[0].c_str();
     if (strcmp(_cmd, "cp") == 0) {
         if (result.size() != 3) return 1;
+#ifdef IS_HOST
+        const char* _path = result[2].c_str();
+#else
+        const char *prefix = "/data/extra/";
+        char *_path = (char*) malloc(strlen(dst_f) + strlen(prefix) + 1);
+        strcpy(_path, prefix);
+        strcat(_path, result[2].c_str());
+#endif
         cp_file(result[1].c_str(), result[2].c_str());
     } else if (strcmp(_cmd, "chmod") == 0) {
         if (result.size() != 3) return 1;
         do_chmod(result[1].c_str(), result[2].c_str());
     } else if (strcmp(_cmd, "chown") == 0) {
         if (result.size() != 4) return 1;
-        do_chown(result[1].c_str(), result[2].c_str(), result[3].c_str());
+#ifdef IS_HOST
+        const char *_path = result[1].c_str();
+#else
+        const char *prefix = "/data/extra/";
+        char *_path = (char*) malloc(strlen(result[1].c_str()) + strlen(prefix) + 1);
+        strcpy(_path, prefix);
+        strcat(_path, result[1].c_str());
+#endif
+        do_chown(_path, result[2].c_str(), result[3].c_str());
     } else if (strcmp(_cmd, "fixperms") == 0) {
 #ifdef IS_HOST
         printf("chown and chmod as necessary here.\n");
