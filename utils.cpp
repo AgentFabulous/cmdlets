@@ -1,7 +1,11 @@
+#include <cstring>
+#include <fstream>
 #include <grp.h>
 #include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
+#include <sys/stat.h>
 #include <sys/unistd.h>
 
 #include "utils.h"
@@ -32,4 +36,42 @@ void do_chown (const char *file_path,
         perror("chown");
         exit(1);
     }
+}
+
+void do_chmod(const char *mode, const char *file_path) {
+    if (!is_number(mode)) { printf("u nub"); return; }
+    if (chmod(file_path,strtol(mode, 0, 8)) < 0) {
+        perror("chmod");
+        exit(1);
+    }
+}
+
+void cp_file(const char *src_f, const char *dst_f) {
+    std::ifstream src(src_f, std::ios::binary);
+    std::ofstream dst(dst_f, std::ios::binary);
+    dst << src.rdbuf();
+}
+
+int validatePath(std::string& str) {
+    std::string root("/");
+    std::string parent("..");
+    std::string term(";");
+    std::string _and("&&");
+    std::string _or("||");
+    std::string dollar("$");
+    std::string b1("(");
+    std::string b2(")");
+
+    return !(str.compare("/") == 0 ||
+                str.find(parent) != std::string::npos ||
+                str.find(term) != std::string::npos ||
+                str.find(_and) != std::string::npos ||
+                str.find(_or) != std::string::npos ||
+                str.find(dollar) != std::string::npos ||
+                str.find(b1) != std::string::npos ||
+                str.find(b2) != std::string::npos);
+}
+
+bool is_number(const char* str) {
+    return(strspn(str, "0123456789") == strlen(str));
 }
