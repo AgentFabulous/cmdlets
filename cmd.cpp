@@ -17,67 +17,102 @@ int cmd_processor(char *cmd) {
     };
 
     const char *_cmd = result[0].c_str();
+
     if (strcmp(_cmd, "cp") == 0) {
-        if (result.size() != 3) return 1;
-#ifdef IS_HOST
-        const char* _path = result[2].c_str();
-#else
-        const char *prefix = "/data/extra/";
-        char *_path = (char*) malloc(strlen(dst_f) + strlen(prefix) + 1);
-        strcpy(_path, prefix);
-        strcat(_path, result[2].c_str());
-#endif
-        cp_file(result[1].c_str(), result[2].c_str());
+        return cmd_cp(result);
     } else if (strcmp(_cmd, "chmod") == 0) {
-        if (result.size() != 3) return 1;
-        do_chmod(result[1].c_str(), result[2].c_str());
+        return cmd_chmod(result);
     } else if (strcmp(_cmd, "chown") == 0) {
-        if (result.size() != 4) return 1;
-#ifdef IS_HOST
-        const char *_path = result[1].c_str();
-#else
-        const char *prefix = "/data/extra/";
-        char *_path = (char*) malloc(strlen(result[1].c_str()) + strlen(prefix) + 1);
-        strcpy(_path, prefix);
-        strcat(_path, result[1].c_str());
-#endif
-        do_chown(_path, result[2].c_str(), result[3].c_str());
+        return cmd_chown(result);
     } else if (strcmp(_cmd, "fixperms") == 0) {
-#ifdef IS_HOST
-        printf("chown and chmod as necessary here.\n");
-#else
-        system("chown -R root:root /data/extra");
-        system("chmod -R 0755 /data/extra");
-        system("chmod -R 0644 $(find /data/extra -name *.apk)");
-#endif
+        return cmd_fixperms(result);
     } else if (strcmp(_cmd, "del") == 0) {
-        if (result.size() != 2) return 1;
-        std::string path = result[1];
-        if (validatePath(path)) {
-#ifdef IS_HOST
-            const char *_del = "rm -rf ";
-#else
-            const char *_del = "rm -rf /data/extra/";
-#endif
-            char* del_cmd = (char*) malloc(strlen(_del) + strlen(path.c_str()) + 1);
-            strcpy(del_cmd, _del);
-            strcat(del_cmd, path.c_str());
-            system(del_cmd); // consider using exec family here
-        }
+        return cmd_del(result);
     } else if (strcmp(_cmd, "mkdir") == 0) {
-        if (result.size() != 2) return 1;
-        std::string path = result[1];
-        if (validatePath(path)) {
+        return cmd_mkdir(result);
+    }
+
+    return -1;
+}
+
+int cmd_cp(std::vector<std::string>& input) {
+    if (input.size() != 3) return 1;
 #ifdef IS_HOST
-            const char * _mkdir = "mkdir -p ";
+    const char* _path = input[2].c_str();
 #else
-            const char * _mkdir = "mkdir -p /data/extra/";
+    const char *prefix = "/data/extra/";
+    char *_path = (char*) malloc(strlen(input[2].c_str()) + strlen(prefix) + 1);
+    strcpy(_path, prefix);
+    strcat(_path, input[2].c_str());
 #endif
-            char* mkdir_cmd = (char*) malloc(strlen(_mkdir) + strlen(path.c_str()) + 1);
-            strcpy(mkdir_cmd, + _mkdir);
-            strcat(mkdir_cmd, path.c_str());
-            system(mkdir_cmd); // consider using exec family here
-        }
+    cp_file(input[1].c_str(), input[2].c_str());
+    return 0;
+}
+
+int cmd_chmod(std::vector<std::string>& input) {
+    if (input.size() != 3) return 1;
+    do_chmod(input[1].c_str(), input[2].c_str());
+    return 0;
+}
+
+int cmd_chown(std::vector<std::string>& input) {
+    if (input.size() != 4) return 1;
+
+#ifdef IS_HOST
+    const char *_path = input[1].c_str();
+#else
+    const char *prefix = "/data/extra/";
+    char *_path = (char*) malloc(strlen(input[1].c_str()) + strlen(prefix) + 1);
+    strcpy(_path, prefix);
+    strcat(_path, input[1].c_str());
+#endif
+
+    do_chown(_path, input[2].c_str(), input[3].c_str());
+    return 0;
+}
+
+int cmd_fixperms(std::vector<std::string>& input) {
+#ifdef IS_HOST
+    printf("chown and chmod as necessary here.\n");
+#else
+    system("chown -R root:root /data/extra");
+    system("chmod -R 0755 /data/extra");
+    system("chmod -R 0644 $(find /data/extra -name *.apk)");
+#endif
+
+    return 0;
+}
+
+int cmd_del(std::vector<std::string>& input) {
+    if (input.size() != 2) return 1;
+    std::string path = input[1];
+    if (validatePath(path)) {
+#ifdef IS_HOST
+        const char *_del = "rm -rf ";
+#else
+        const char *_del = "rm -rf /data/extra/";
+#endif
+        char* del_cmd = (char*) malloc(strlen(_del) + strlen(path.c_str()) + 1);
+        strcpy(del_cmd, _del);
+        strcat(del_cmd, path.c_str());
+        system(del_cmd); // consider using exec family here
+    }
+    return 0;
+}
+
+int cmd_mkdir(std::vector<std::string>& input) {
+    if (input.size() != 2) return 1;
+    std::string path = input[1];
+    if (validatePath(path)) {
+#ifdef IS_HOST
+        const char * _mkdir = "mkdir -p ";
+#else
+        const char * _mkdir = "mkdir -p /data/extra/";
+#endif
+        char* mkdir_cmd = (char*) malloc(strlen(_mkdir) + strlen(path.c_str()) + 1);
+        strcpy(mkdir_cmd, + _mkdir);
+        strcat(mkdir_cmd, path.c_str());
+        system(mkdir_cmd); // consider using exec family here
     }
     return 0;
 }
